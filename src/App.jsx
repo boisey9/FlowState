@@ -295,10 +295,10 @@ export default function FlowStatePrototype() {
           <div>
             <div className="mb-2 flex items-center gap-3 text-sm text-emerald-300">
               <FlowStateLogo variant="mark" className="h-8 w-8 rounded-xl" />
-              <span>FlowState Prototype</span>
+              <span>Trade Banana</span>
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Probability-first trading cockpit</h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">FlowState measures the current market regime, checks whether that regime tends to continue, and separates market context from trade execution.</p>
+            <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Peel back the charts. Find the good stuff.</h1>
+            <p className="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">Trade Banana measures the current market regime, checks whether that regime tends to continue, and separates market context from trade execution.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge title={model.source_mode === "twelve_data_live" ? "Candles are fetched from Twelve Data and saved before analysis." : "Demo data is active. Do not use this output for trading decisions."} variant={model.source_mode === "twelve_data_live" ? "good" : "warn"}><Database className="mr-1 h-3 w-3" /> {model.source_mode === "twelve_data_live" ? "Live market data" : "Demo data active"}</Badge>
