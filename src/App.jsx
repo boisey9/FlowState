@@ -4,6 +4,7 @@ import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Database, Gaug
 import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import FlowStateLogo from "./components/FlowStateLogo";
+import AlertStatusPanel, { getAlertStatus } from "./components/AlertStatusPanel";
 
 // FlowState Supabase project created in this chat.
 // Add VITE_SUPABASE_ANON_KEY in Vercel/Bolt/Cursor env variables.
@@ -276,6 +277,7 @@ export default function FlowStatePrototype() {
   const mix = model.regime_mix || { Bear: 0, Sideways: 0, Bull: 0 };
   const decision = model.decision || {};
   const probs = model.probabilities || {};
+  const alertStatus = useMemo(() => getAlertStatus(model), [model]);
 
   const tone = decision.action === "READY_LONG" ? "bull" : decision.action === "READY_SHORT" ? "bear" : decision.action === "IGNORE" ? "danger" : decision.bias === "Bullish" || decision.bias === "Bearish" ? "warn" : "neutral";
   const toneClasses = {
@@ -306,7 +308,11 @@ export default function FlowStatePrototype() {
         </div>
 
         {error ? <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-3 text-sm text-amber-100">{error}</div> : null}
-
+        <AlertStatusPanel
+          alert={alertStatus}
+          browserAlerts={false}
+          onToggle={() => {}}
+        />
         <Card className="border-white/10 bg-white/[0.03] shadow-2xl shadow-black/20">
           <CardContent className="p-4 md:p-5">
             <div className="grid gap-4 md:grid-cols-[1.1fr_.9fr]">
