@@ -1,11 +1,11 @@
 {
-  "name": "FlowState",
-  "short_name": "FlowState",
-  "description": "Probability-first trading decision cockpit.",
+  "name": "Trade Banana",
+  "short_name": "Trade Banana",
+  "description": "Peel back the charts. Find the good stuff.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#070B0A",
-  "theme_color": "#070B0A",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
