@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, AlertTriangle, BarChart3, Brain, CheckCircle2, Clock, Database, Gauge, HelpCircle, Info, LineChart, Lock, PlayCircle, RefreshCw, Shield, TrendingDown, TrendingUp, Zap } from "lucide-react";
+import { Activity, AlertTriangle, BarChart3, CheckCircle2, Clock, Database, Gauge, HelpCircle, Info, LineChart, Lock, PlayCircle, RefreshCw, Shield, TrendingDown, TrendingUp, Zap } from "lucide-react";
 import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
+import FlowStateLogo from "./components/FlowStateLogo";
 
 // FlowState Supabase project created in this chat.
 // Add VITE_SUPABASE_ANON_KEY in Vercel/Bolt/Cursor env variables.
@@ -290,7 +291,10 @@ export default function FlowStatePrototype() {
       <div className="mx-auto max-w-7xl space-y-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="mb-2 flex items-center gap-2 text-sm text-emerald-300"><Brain className="h-4 w-4" /> FlowState Prototype</div>
+            <div className="mb-2 flex items-center gap-3 text-sm text-emerald-300">
+              <FlowStateLogo variant="mark" className="h-8 w-8 rounded-xl" />
+              <span>FlowState Prototype</span>
+            </div>
             <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Probability-first trading cockpit</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">FlowState measures the current market regime, checks whether that regime tends to continue, and separates market context from trade execution.</p>
           </div>
