@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Bell, BellRing } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
@@ -77,6 +78,10 @@ export function shouldNotify(alert) {
 }
 
 export default function AlertStatusPanel({ alert, browserAlerts, onToggle }) {
+  const [internalAlerts, setInternalAlerts] = useState(() => localStorage.getItem("flowstate_browser_alerts") === "true");
+  const [lastNotified, setLastNotified] = useState("");
+  const alertsEnabled = typeof browserAlerts === "boolean" ? browserAlerts || internalAlerts : internalAlerts;
+
   const classes = {
     bull: "border-emerald-400/30 bg-emerald-500/10 text-emerald-100",
     bear: "border-rose-400/30 bg-rose-500/10 text-rose-100",
@@ -85,6 +90,41 @@ export default function AlertStatusPanel({ alert, browserAlerts, onToggle }) {
   };
 
   const Icon = alert.level.includes("READY") ? BellRing : alert.level === "NO_ALERT" ? Bell : AlertTriangle;
+  const buttonText = useMemo(() => {
+    if (!("Notification" in window)) return "Browser alerts unavailable";
+    if (Notification.permission === "denied") return "Alerts blocked in browser";
+    return alertsEnabled ? "Browser alerts on" : "Enable browser alerts";
+  }, [alertsEnabled]);
+
+  async function handleToggle() {
+    if (!("Notification" in window)) return;
+
+    if (!alertsEnabled && Notification.permission !== "granted") {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
+    }
+
+    const next = !alertsEnabled;
+    setInternalAlerts(next);
+    localStorage.setItem("flowstate_browser_alerts", String(next));
+
+    if (typeof onToggle === "function") {
+      onToggle(next);
+    }
+  }
+
+  useEffect(() => {
+    if (!alertsEnabled || !("Notification" in window) || Notification.permission !== "granted" || !shouldNotify(alert)) return;
+
+    const key = `${alert.level}-${alert.title}-${alert.detail}`;
+    if (key === lastNotified) return;
+
+    new Notification(`FlowState ${alert.label}`, {
+      body: alert.detail,
+      icon: "/android-chrome-192x192.png",
+    });
+    setLastNotified(key);
+  }, [alert, alertsEnabled, lastNotified]);
 
   return (
     <Card className={`border ${classes[alert.variant] || classes.neutral}`}>
@@ -103,11 +143,12 @@ export default function AlertStatusPanel({ alert, browserAlerts, onToggle }) {
             </div>
           </div>
           <Button
-            onClick={onToggle}
-            className={`rounded-xl ${browserAlerts ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "bg-white/10 text-white hover:bg-white/15"}`}
+            onClick={handleToggle}
+            disabled={!("Notification" in window) || Notification.permission === "denied"}
+            className={`rounded-xl ${alertsEnabled ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "bg-white/10 text-white hover:bg-white/15"}`}
           >
-            {browserAlerts ? <BellRing className="mr-2 h-4 w-4" /> : <Bell className="mr-2 h-4 w-4" />}
-            {browserAlerts ? "Browser alerts on" : "Enable browser alerts"}
+            {alertsEnabled ? <BellRing className="mr-2 h-4 w-4" /> : <Bell className="mr-2 h-4 w-4" />}
+            {buttonText}
           </Button>
         </div>
       </CardContent>
