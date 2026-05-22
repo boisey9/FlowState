@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, BarChart3, Brain, CheckCircle2, Clock, Database, Gauge, HelpCircle, Info, LineChart, Lock, PlayCircle, RefreshCw, Shield, TrendingDown, TrendingUp, Zap } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "./components/ui/card";
+import { Button } from "./components/ui/button";
 
 // FlowState Supabase project created in this chat.
 // Add VITE_SUPABASE_ANON_KEY in Vercel/Bolt/Cursor env variables.
