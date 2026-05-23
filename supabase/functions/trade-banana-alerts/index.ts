@@ -159,7 +159,6 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRole, { auth: { persistSession: false } });
 
     let body: Record<string, unknown> = {};
@@ -175,7 +174,7 @@ Deno.serve(async (req: Request) => {
     for (const symbol of symbols) {
       for (const timeframe of timeframes) {
         try {
-          const analysis = await runAnalysis(symbol, timeframe, anonKey, supabaseUrl);
+          const analysis = await runAnalysis(symbol, timeframe, serviceRole, supabaseUrl);
           const level = getAlertLevel(analysis);
 
           if (!shouldSend(level, includeDataWarnings)) {
