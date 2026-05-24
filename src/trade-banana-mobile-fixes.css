@@ -1,0 +1,25 @@
+/* Mobile layout fixes only: keeps bottom navigation from covering scrollable content. */
+
+.trade-banana-bottom-nav {
+  bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+  padding-bottom: 0.5rem !important;
+}
+
+@media (max-width: 767px) {
+  .min-h-screen {
+    padding-bottom: calc(9.5rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  .trade-banana-bottom-nav {
+    left: 1rem !important;
+    right: 1rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .min-h-screen {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    padding-top: 1.25rem !important;
+  }
+}
