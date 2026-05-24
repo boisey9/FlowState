@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import App from "./App.jsx";
 import WatchlistPage from "./pages/WatchlistPage.jsx";
+import TradeBananaNavigation from "./components/TradeBananaNavigation.jsx";
 
 function getRoute() {
   const hash = window.location.hash.replace("#", "").toLowerCase();
@@ -17,6 +18,10 @@ export default function TradeBananaRouter() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  if (route === "watchlist") return <WatchlistPage />;
-  return <App />;
+  return (
+    <>
+      {route === "watchlist" ? <WatchlistPage /> : <App />}
+      <TradeBananaNavigation active={route} />
+    </>
+  );
 }
