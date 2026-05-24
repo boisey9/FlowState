@@ -209,22 +209,22 @@ function getWhyDecision(model, smcConfirm) {
   const action = model.decision?.action || "WAIT";
 
   if (action === "IGNORE") {
-    return "FlowState says IGNORE because the data quality gate failed. When candles are stale, incomplete, or unreliable, no trading decision should be made from the output.";
+    return "Trade Banana says IGNORE because the data quality gate failed. When candles are stale, incomplete, or unreliable, no trading decision should be made from the output.";
   }
 
   if (action === "READY_LONG") {
-    return `FlowState says READY LONG because the current ${current} state favors upside, Bull Next is ${bull}%, Bear Next is ${bear}%, and entry confirmation is turned on. Define invalidation and risk before acting.`;
+    return `Trade Banana says READY LONG because the current ${current} state favors upside, Bull Next is ${bull}%, Bear Next is ${bear}%, and entry confirmation is turned on. Define invalidation and risk before acting.`;
   }
 
   if (action === "READY_SHORT") {
-    return `FlowState says READY SHORT because the current ${current} state favors downside, Bear Next is ${bear}%, Bull Next is ${bull}%, and entry confirmation is turned on. Define invalidation and risk before acting.`;
+    return `Trade Banana says READY SHORT because the current ${current} state favors downside, Bear Next is ${bear}%, Bull Next is ${bull}%, and entry confirmation is turned on. Define invalidation and risk before acting.`;
   }
 
   if (!smcConfirm && Math.abs(edge) >= 12 && current !== "Sideways") {
-    return `FlowState says WAIT because the market context is directional, but entry confirmation is missing. Current state is ${current}. Bull Next is ${bull}%, Bear Next is ${bear}%, creating a ${edge}% directional edge. Context is present, but timing is not confirmed.`;
+    return `Trade Banana says WAIT because the market context is directional, but entry confirmation is missing. Current state is ${current}. Bull Next is ${bull}%, Bear Next is ${bear}%, creating a ${edge}% directional edge. Context is present, but timing is not confirmed.`;
   }
 
-  return `FlowState says WAIT because there is no clean directional edge. Bull Next is ${bull}% and Bear Next is ${bear}%, so the model is not showing enough separation to support a trade idea.`;
+  return `Trade Banana says WAIT because there is no clean directional edge. Bull Next is ${bull}% and Bear Next is ${bear}%, so the model is not showing enough separation to support a trade idea.`;
 }
 
 export default function FlowStatePrototype() {
@@ -255,7 +255,7 @@ export default function FlowStatePrototype() {
         body: JSON.stringify({ symbol, timeframe: tf, execution_confirmed: smcConfirm, outputsize: 5000 }),
       });
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "FlowState function failed");
+      if (!res.ok || data.error) throw new Error(data.error || "Trade Banana function failed");
       setDataQuality(data.data_quality?.score ?? 0);
       setModel({ ...data, source_mode: "twelve_data_live" });
     } catch (err) {
@@ -301,8 +301,8 @@ export default function FlowStatePrototype() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge title={model.source_mode === "twelve_data_live" ? "Candles are fetched from Twelve Data and saved before analysis." : "Demo data is active. Do not use this output for trading decisions."} variant={model.source_mode === "twelve_data_live" ? "good" : "warn"}><Database className="mr-1 h-3 w-3" /> {model.source_mode === "twelve_data_live" ? "Live market data" : "Demo data active"}</Badge>
-            <Badge title="FlowState only provides decision support. It does not place trades or connect to a broker."><Lock className="mr-1 h-3 w-3" /> No live orders</Badge>
-            <Badge title="Use FlowState as a second opinion before trading. Final trade decisions and risk remain your responsibility." variant="warn"><Shield className="mr-1 h-3 w-3" /> Decision support</Badge>
+            <Badge title="Trade Banana only provides decision support. It does not place trades or connect to a broker."><Lock className="mr-1 h-3 w-3" /> No live orders</Badge>
+            <Badge title="Use Trade Banana as a second opinion before trading. Final trade decisions and risk remain your responsibility." variant="warn"><Shield className="mr-1 h-3 w-3" /> Decision support</Badge>
           </div>
         </div>
 
@@ -349,7 +349,7 @@ export default function FlowStatePrototype() {
         <div className="grid gap-5 lg:grid-cols-3">
           <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Current Market State" subtitle="Current Bull, Bear, or Sideways classification based on recent rolling return behavior." icon={<Activity className="h-5 w-5 text-emerald-300" />} tooltip="This tells you the current statistical market state. It is context, not an automatic entry." /><div className={`inline-flex rounded-2xl border px-4 py-2 text-2xl font-bold ${stateStyle[current]}`}>{current} Regime</div><p className="mt-4 text-sm text-slate-400">Asset behavior: {ASSETS[symbol].personality}.</p><div className="mt-5 text-sm text-slate-400">As of: {model.current?.ts || "—"}</div></CardContent></Card>
           <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Data Quality Gate" subtitle="Checks whether candle data is fresh, complete, and usable before decisions are trusted." icon={<Gauge className="h-5 w-5 text-emerald-300" />} tooltip="Below 80 blocks trading decisions. 90–100 means data is clean enough for analysis." /><div className="text-4xl font-bold">{model.data_quality?.score ?? dataQuality}%</div><div className="mt-5 space-y-2 text-sm text-slate-300">{(model.data_quality?.issues || []).length ? model.data_quality.issues.map((x) => <div key={x} className="rounded-xl border border-amber-400/20 bg-amber-500/10 p-2 text-amber-100">{x}</div>) : <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-2 text-emerald-100">Data is clean — no quality issues detected</div>}</div></CardContent></Card>
-          <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Execution Filter" subtitle="Separates directional context from actual entry timing." icon={<Zap className="h-5 w-5 text-amber-300" />} tooltip="FlowState may show strong context but still say WAIT if entry confirmation is missing." /><div className="space-y-3"><div className={`rounded-2xl border p-3 ${smcConfirm ? "border-emerald-400/30 bg-emerald-500/10" : "border-white/10 bg-white/5"}`}><div className="font-semibold">Entry confirmation</div><div className="text-sm text-slate-400">Turn on only after sweep, displacement, retest, or your valid entry trigger.</div></div><div className="rounded-2xl border border-white/10 bg-white/5 p-3"><div className="font-semibold">Context is not entry</div><div className="text-sm text-slate-400">A probability edge gives bias. Your entry model confirms timing.</div></div></div></CardContent></Card>
+          <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Execution Filter" subtitle="Separates directional context from actual entry timing." icon={<Zap className="h-5 w-5 text-amber-300" />} tooltip="Trade Banana may show strong context but still say WAIT if entry confirmation is missing." /><div className="space-y-3"><div className={`rounded-2xl border p-3 ${smcConfirm ? "border-emerald-400/30 bg-emerald-500/10" : "border-white/10 bg-white/5"}`}><div className="font-semibold">Entry confirmation</div><div className="text-sm text-slate-400">Turn on only after sweep, displacement, retest, or your valid entry trigger.</div></div><div className="rounded-2xl border border-white/10 bg-white/5 p-3"><div className="font-semibold">Context is not entry</div><div className="text-sm text-slate-400">A probability edge gives bias. Your entry model confirms timing.</div></div></div></CardContent></Card>
         </div>
 
         <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Markov Transition Matrix" subtitle="How the market usually moves from one regime to the next. Read the active row first." icon={<BarChart3 className="h-5 w-5 text-emerald-300" />} tooltip="Each row starts with the current regime. Each column shows the probability of the next regime. Rows should add up to 100%." /><Matrix matrix={model.matrix} current={current} /></CardContent></Card>
@@ -366,7 +366,7 @@ export default function FlowStatePrototype() {
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>2. Check Current Market State.</b><br />This shows Bull, Bear, or Sideways context.</div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>3. Read the active matrix row.</b><br />It shows what usually happens next from the current state.</div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>4. Use Directional Edge.</b><br />Positive favors long context. Negative favors short context.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>5. Confirm execution.</b><br />FlowState gives context. Your entry model confirms timing.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>5. Confirm execution.</b><br />Trade Banana gives context. Your entry model confirms timing.</div>
           </div>
         </CardContent></Card>
       </div>
