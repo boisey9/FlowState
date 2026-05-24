@@ -9,6 +9,37 @@ function getRoute() {
   return "analyze";
 }
 
+function applySavedAnalyzeSelection() {
+  const savedSymbol = localStorage.getItem("trade_banana_selected_symbol");
+  const savedTimeframe = localStorage.getItem("trade_banana_selected_timeframe");
+  const selects = Array.from(document.querySelectorAll("select"));
+
+  const setSelectValue = (value) => {
+    if (!value) return;
+    const target = selects.find((select) => Array.from(select.options).some((option) => option.value === value));
+    if (!target || target.value === value) return;
+    target.value = value;
+    target.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
+  setSelectValue(savedSymbol);
+  setSelectValue(savedTimeframe);
+}
+
+function AnalyzeSelectionSync({ active }) {
+  useEffect(() => {
+    if (!active) return;
+    const timers = [
+      window.setTimeout(applySavedAnalyzeSelection, 0),
+      window.setTimeout(applySavedAnalyzeSelection, 80),
+      window.setTimeout(applySavedAnalyzeSelection, 250),
+    ];
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [active]);
+
+  return null;
+}
+
 export default function TradeBananaRouter() {
   const [route, setRoute] = useState(getRoute);
 
@@ -21,6 +52,7 @@ export default function TradeBananaRouter() {
   return (
     <>
       {route === "watchlist" ? <WatchlistPage /> : <App />}
+      <AnalyzeSelectionSync active={route === "analyze"} />
       <TradeBananaNavigation active={route} />
     </>
   );
