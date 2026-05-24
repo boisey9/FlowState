@@ -27,7 +27,7 @@ export default function TradeBananaNavigation({ active = "analyze" }) {
         </div>
       </div>
 
-      <div className="fixed bottom-4 left-4 right-4 z-30 grid grid-cols-3 rounded-3xl border border-yellow-400/20 bg-black/90 p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] text-center text-xs backdrop-blur-xl md:hidden">
+      <div className="trade-banana-bottom-nav fixed bottom-3 left-4 right-4 z-30 grid grid-cols-3 rounded-3xl border border-yellow-400/20 bg-black/90 p-2 text-center text-xs backdrop-blur-xl md:hidden">
         <button onClick={() => go("analyze")} className={`rounded-2xl border p-3 ${itemClass("analyze")}`}>
           <Search className="mx-auto mb-1 h-5 w-5" />
           Analyze
