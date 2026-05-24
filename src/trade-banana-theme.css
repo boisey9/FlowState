@@ -1,0 +1,270 @@
+/*
+  Trade Banana visual theme.
+  UI-only overrides: no engines, signals, API calls, scoring, or trading logic are changed here.
+*/
+
+:root {
+  --tb-black: #030303;
+  --tb-charcoal: #0b0b08;
+  --tb-panel: rgba(18, 17, 11, 0.78);
+  --tb-panel-strong: rgba(25, 23, 14, 0.9);
+  --tb-yellow: #ffd400;
+  --tb-yellow-soft: #ffe772;
+  --tb-gold: #a88b00;
+  --tb-border: rgba(255, 212, 0, 0.22);
+  --tb-border-strong: rgba(255, 212, 0, 0.48);
+  --tb-white: #f8f8f2;
+  --tb-muted: #c3c0ad;
+  --tb-lime: #31f27a;
+  --tb-lime-soft: #a7ffc6;
+  --tb-red: #ff4b6e;
+}
+
+body,
+html {
+  background: var(--tb-black) !important;
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% 7%, rgba(255, 212, 0, 0.16), transparent 24%),
+    radial-gradient(circle at 78% 18%, rgba(255, 212, 0, 0.13), transparent 30%),
+    radial-gradient(circle at 70% 80%, rgba(255, 212, 0, 0.09), transparent 36%),
+    linear-gradient(180deg, #020202 0%, #070706 46%, #030303 100%) !important;
+}
+
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(255, 212, 0, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 212, 0, 0.018) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: radial-gradient(circle at 72% 35%, black, transparent 74%);
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+.min-h-screen,
+.bg-\[\#070B0A\] {
+  background: transparent !important;
+}
+
+.max-w-7xl {
+  position: relative;
+}
+
+.max-w-7xl::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 110px;
+  right: -95px;
+  width: min(660px, 56vw);
+  height: min(660px, 56vw);
+  border: 1px solid rgba(255, 212, 0, 0.23);
+  border-radius: 999px;
+  box-shadow: inset 0 0 80px rgba(255, 212, 0, 0.055), 0 0 120px rgba(255, 212, 0, 0.08);
+  opacity: 0.46;
+  z-index: -1;
+}
+
+/* Bigger header logo, without changing React logic. */
+img[alt="Trade Banana"][src*="trade-banana-full"] {
+  width: clamp(128px, 15vw, 220px) !important;
+  height: auto !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+  filter: drop-shadow(0 0 16px rgba(255, 212, 0, 0.28));
+}
+
+img[alt="Trade Banana"][src*="trade-banana-mark"] {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 0 13px rgba(255, 212, 0, 0.25));
+}
+
+h1 {
+  color: var(--tb-white) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.045em !important;
+}
+
+h2,
+.font-semibold,
+.font-bold {
+  letter-spacing: -0.018em;
+}
+
+.text-slate-400,
+.text-slate-300 {
+  color: var(--tb-muted) !important;
+}
+
+/* Yellow is the primary brand accent. */
+.text-amber-300,
+.text-amber-200,
+.text-yellow-300 {
+  color: var(--tb-yellow) !important;
+}
+
+.border-white\/10,
+.border-slate-400\/25,
+.border-slate-400\/30,
+.border-amber-400\/20,
+.border-amber-400\/30 {
+  border-color: var(--tb-border) !important;
+}
+
+.border-amber-400\/30,
+.border-emerald-400\/30 {
+  border-color: var(--tb-border-strong) !important;
+}
+
+.bg-white\/\[0\.03\],
+.bg-white\/5,
+.bg-white\/10 {
+  background: linear-gradient(180deg, rgba(255, 212, 0, 0.06), rgba(255, 212, 0, 0.018)) !important;
+}
+
+.bg-black\/20,
+.bg-black\/25 {
+  background: rgba(0, 0, 0, 0.52) !important;
+}
+
+.bg-slate-950,
+select.bg-slate-950 {
+  background: rgba(3, 3, 3, 0.92) !important;
+  color: var(--tb-white) !important;
+  border-color: rgba(255, 212, 0, 0.30) !important;
+}
+
+.rounded-3xl.border,
+.rounded-2xl.border,
+.border.bg-white\/\[0\.03\] {
+  box-shadow: 0 22px 75px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.shadow-2xl {
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.52), 0 0 34px rgba(255, 212, 0, 0.13) !important;
+}
+
+button.rounded-xl,
+select.rounded-xl {
+  min-height: 44px;
+  border: 1px solid rgba(255, 212, 0, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055), 0 10px 28px rgba(0, 0, 0, 0.25);
+}
+
+button.bg-white\/10 {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--tb-white) !important;
+}
+
+button.bg-white\/10:hover,
+select.rounded-xl:hover {
+  background: rgba(255, 212, 0, 0.11) !important;
+  border-color: rgba(255, 212, 0, 0.45) !important;
+}
+
+button.bg-emerald-500,
+.bg-emerald-500 {
+  background: linear-gradient(135deg, var(--tb-yellow), #f0bf00) !important;
+  color: #050505 !important;
+  border-color: rgba(255, 212, 0, 0.78) !important;
+}
+
+button.bg-emerald-500:hover {
+  background: linear-gradient(135deg, #ffe866, var(--tb-yellow)) !important;
+}
+
+/* Keep bullish/positive items lime green, per the requested style. */
+.text-emerald-300,
+.text-emerald-200,
+.text-emerald-100 {
+  color: var(--tb-lime-soft) !important;
+}
+
+.bg-emerald-500\/10,
+.bg-emerald-500\/15 {
+  background: rgba(49, 242, 122, 0.12) !important;
+}
+
+.border-emerald-400\/20,
+.border-emerald-400\/30 {
+  border-color: rgba(49, 242, 122, 0.36) !important;
+}
+
+.bg-rose-500\/10,
+.bg-rose-500\/15 {
+  background: rgba(255, 75, 110, 0.13) !important;
+}
+
+.border-rose-400\/20,
+.border-rose-400\/30,
+.border-rose-400\/40 {
+  border-color: rgba(255, 75, 110, 0.40) !important;
+}
+
+.text-rose-200,
+.text-rose-100 {
+  color: #ffc2cc !important;
+}
+
+/* Mini chart is UI-only: the data points stay the same, only brand coloring changes. */
+svg path[stroke="rgba(111,240,166,.9)"] {
+  stroke: rgba(255, 212, 0, 0.96) !important;
+}
+
+svg rect[fill="rgba(111,240,166,.75)"] {
+  fill: rgba(49, 242, 122, 0.78) !important;
+}
+
+svg rect[fill="rgba(251,113,133,.75)"] {
+  fill: rgba(255, 75, 110, 0.76) !important;
+}
+
+svg {
+  filter: drop-shadow(0 0 8px rgba(255, 212, 0, 0.08));
+}
+
+/* Alert panel polish */
+.tracking-\[0\.2em\] {
+  color: rgba(255, 245, 191, 0.72) !important;
+}
+
+@media (max-width: 640px) {
+  .min-h-screen {
+    padding: 1.25rem !important;
+  }
+
+  img[alt="Trade Banana"][src*="trade-banana-full"] {
+    width: 104px !important;
+  }
+
+  .text-3xl {
+    font-size: 2.32rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .rounded-3xl.border,
+  .rounded-2xl.border {
+    border-radius: 1.6rem !important;
+  }
+
+  .max-w-7xl::after {
+    top: 220px;
+    right: -190px;
+    width: 430px;
+    height: 430px;
+    opacity: 0.30;
+  }
+}
