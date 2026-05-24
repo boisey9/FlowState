@@ -6,17 +6,29 @@
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #050505;
+
   --banana-black: #050505;
-  --banana-panel: #10100b;
-  --banana-card: #15140f;
+  --banana-ink: #080807;
+  --banana-panel: #0d0d0a;
+  --banana-card: #12110d;
+  --banana-card-soft: #181710;
   --banana-yellow: #ffd400;
-  --banana-gold: #c9a900;
-  --banana-soft: #fff3a3;
+  --banana-yellow-2: #f2c300;
+  --banana-gold: #a88b00;
+  --banana-soft: #fff2a8;
   --banana-white: #f8f8f2;
+  --banana-muted: #b8b6a8;
+  --banana-border: rgba(255, 212, 0, 0.18);
+  --banana-border-strong: rgba(255, 212, 0, 0.42);
+  --banana-glow: 0 0 28px rgba(255, 212, 0, 0.18);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  background: var(--banana-black);
 }
 
 body {
@@ -24,9 +36,29 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 212, 0, 0.18), transparent 28%),
-    radial-gradient(circle at 84% 16%, rgba(255, 212, 0, 0.09), transparent 22%),
-    #050505;
+    radial-gradient(circle at 18% 8%, rgba(255, 212, 0, 0.18), transparent 26%),
+    radial-gradient(circle at 85% 14%, rgba(255, 212, 0, 0.12), transparent 28%),
+    radial-gradient(circle at 70% 92%, rgba(255, 212, 0, 0.10), transparent 32%),
+    linear-gradient(180deg, #030303 0%, #070706 42%, #050505 100%);
+  color: var(--banana-white);
+}
+
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(255, 212, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 212, 0, 0.018) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 70% 35%, black, transparent 72%);
+}
+
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -37,4 +69,200 @@ body {
 button,
 select {
   color-scheme: dark;
+}
+
+/* Trade Banana UI-only theme overrides. These only affect styling and do not touch calculations, engines, API calls, or model outputs. */
+.min-h-screen {
+  background:
+    radial-gradient(circle at 22% 8%, rgba(255, 212, 0, 0.16), transparent 26%),
+    radial-gradient(circle at 83% 12%, rgba(255, 212, 0, 0.10), transparent 28%),
+    linear-gradient(180deg, #030303 0%, #070706 46%, #050505 100%) !important;
+}
+
+.max-w-7xl {
+  position: relative;
+}
+
+.max-w-7xl::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 120px;
+  right: -80px;
+  width: min(620px, 52vw);
+  height: min(620px, 52vw);
+  border: 1px solid rgba(255, 212, 0, 0.20);
+  border-radius: 999px;
+  box-shadow: inset 0 0 60px rgba(255, 212, 0, 0.06), 0 0 90px rgba(255, 212, 0, 0.08);
+  opacity: 0.45;
+  z-index: -1;
+}
+
+h1,
+h2,
+.font-semibold,
+.font-bold {
+  letter-spacing: -0.015em;
+}
+
+.text-slate-400,
+.text-slate-300 {
+  color: var(--banana-muted) !important;
+}
+
+.text-emerald-300,
+.text-amber-300 {
+  color: var(--banana-yellow) !important;
+}
+
+.border-white\/10 {
+  border-color: rgba(255, 212, 0, 0.14) !important;
+}
+
+.border-slate-400\/30,
+.border-slate-400\/25 {
+  border-color: rgba(255, 212, 0, 0.22) !important;
+}
+
+.border-emerald-400\/30,
+.border-amber-400\/30 {
+  border-color: var(--banana-border-strong) !important;
+}
+
+.bg-\[\#070B0A\] {
+  background: transparent !important;
+}
+
+.bg-white\/5,
+.bg-white\/10,
+.bg-white\/\[0\.03\] {
+  background: linear-gradient(180deg, rgba(255, 212, 0, 0.06), rgba(255, 212, 0, 0.018)) !important;
+}
+
+.bg-black\/20,
+.bg-black\/25 {
+  background: rgba(0, 0, 0, 0.46) !important;
+}
+
+.bg-slate-950,
+select.bg-slate-950 {
+  background: #030303 !important;
+  border-color: rgba(255, 212, 0, 0.22) !important;
+  color: var(--banana-white) !important;
+}
+
+.rounded-3xl.border,
+.rounded-2xl.border {
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.shadow-2xl {
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.48), var(--banana-glow) !important;
+}
+
+button.rounded-xl,
+select.rounded-xl {
+  min-height: 44px;
+  border: 1px solid rgba(255, 212, 0, 0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+button.bg-white\/10 {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--banana-white) !important;
+}
+
+button.bg-white\/10:hover {
+  background: rgba(255, 212, 0, 0.10) !important;
+  border-color: rgba(255, 212, 0, 0.40) !important;
+}
+
+button.bg-emerald-500,
+.bg-emerald-500 {
+  background: linear-gradient(135deg, var(--banana-yellow), var(--banana-yellow-2)) !important;
+  color: #050505 !important;
+  border-color: rgba(255, 212, 0, 0.70) !important;
+}
+
+button.bg-emerald-500:hover {
+  background: linear-gradient(135deg, #ffe45a, var(--banana-yellow)) !important;
+}
+
+.bg-emerald-500\/10 {
+  background: rgba(255, 212, 0, 0.10) !important;
+}
+
+.text-emerald-200,
+.text-amber-200 {
+  color: var(--banana-soft) !important;
+}
+
+.bg-amber-500\/10 {
+  background: rgba(255, 212, 0, 0.11) !important;
+}
+
+.border-amber-400\/20,
+.border-emerald-400\/20 {
+  border-color: rgba(255, 212, 0, 0.25) !important;
+}
+
+.text-amber-100,
+.text-emerald-100 {
+  color: var(--banana-soft) !important;
+}
+
+.bg-rose-500\/15,
+.bg-rose-500\/10 {
+  background: rgba(255, 54, 92, 0.14) !important;
+}
+
+.border-rose-400\/40,
+.border-rose-400\/30,
+.border-rose-400\/20 {
+  border-color: rgba(255, 75, 112, 0.38) !important;
+}
+
+svg {
+  filter: drop-shadow(0 0 8px rgba(255, 212, 0, 0.10));
+}
+
+/* App logo treatment */
+img[alt="Trade Banana"],
+img[src*="trade-banana"] {
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(255, 212, 0, 0.22));
+}
+
+/* Mini chart keeps the data intact, only recolors the visual line to match the brand. */
+svg path[stroke="rgba(111,240,166,.9)"] {
+  stroke: rgba(255, 212, 0, 0.94) !important;
+}
+
+svg rect[fill="rgba(111,240,166,.75)"] {
+  fill: rgba(255, 212, 0, 0.78) !important;
+}
+
+/* Mobile polish */
+@media (max-width: 640px) {
+  .min-h-screen {
+    padding: 1.25rem !important;
+  }
+
+  .text-3xl {
+    font-size: 2.35rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .rounded-3xl.border,
+  .rounded-2xl.border {
+    border-radius: 1.6rem !important;
+  }
+
+  .max-w-7xl::after {
+    top: 220px;
+    right: -180px;
+    width: 420px;
+    height: 420px;
+    opacity: 0.28;
+  }
 }
