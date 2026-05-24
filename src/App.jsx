@@ -294,7 +294,7 @@ export default function FlowStatePrototype() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
            <div className="mb-4">
-            <FlowStateLogo variant="mark" className="h-14 w-14 rounded-2xl md:h-16 md:w-16" />
+            <FlowStateLogo variant="full" className="h-14 w-14 rounded-2xl md:h-16 md:w-16" />
           </div>
             <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Peel back the charts. Find the good stuff.</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">Trade Banana measures the current market regime, checks whether that regime tends to continue, and separates market context from trade execution.</p>
