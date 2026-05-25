@@ -137,13 +137,13 @@ async function sendTelegram(text: string) {
   return { sent: true, error: null };
 }
 
-async function runAnalysis(symbol: string, timeframe: string, anonKey: string, supabaseUrl: string) {
+async function runAnalysis(symbol: string, timeframe: string, serviceRole: string, supabaseUrl: string) {
   const res = await fetch(`${supabaseUrl}/functions/v1/flowstate-analysis`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "apikey": anonKey,
-      "Authorization": `Bearer ${anonKey}`,
+      "apikey": serviceRole,
+      "Authorization": `Bearer ${serviceRole}`,
     },
     body: JSON.stringify({ symbol, timeframe, execution_confirmed: false, outputsize: 5000 }),
   });
@@ -164,6 +164,17 @@ Deno.serve(async (req: Request) => {
     let body: Record<string, unknown> = {};
     if (req.method === "POST") {
       try { body = await req.json(); } catch (_) { body = {}; }
+    }
+
+    if (body.test === true) {
+      const telegram = await sendTelegram([
+        "🍌 Trade Banana Telegram test",
+        "",
+        "Connection confirmed.",
+        "Supabase Edge Function can reach Telegram.",
+        "Decision support only — not financial advice."
+      ].join("\n"));
+      return json({ ok: telegram.sent, test: true, telegram });
     }
 
     const symbols = Array.isArray(body.symbols) && body.symbols.length ? body.symbols.map(String) : DEFAULT_WATCHLIST;
