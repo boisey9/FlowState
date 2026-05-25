@@ -21,7 +21,7 @@ export default function TradeBananaNavigation({ active = "analyze" }) {
           <button onClick={() => go("watchlist")} className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("watchlist")}`}>
             Watchlist
           </button>
-          <button className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("alerts")}`}>
+          <button onClick={() => go("alerts")} className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("alerts")}`}>
             Alerts
           </button>
         </div>
@@ -36,7 +36,7 @@ export default function TradeBananaNavigation({ active = "analyze" }) {
           <Star className="mx-auto mb-1 h-5 w-5" />
           Watchlist
         </button>
-        <button className={`rounded-2xl border p-3 ${itemClass("alerts")}`}>
+        <button onClick={() => go("alerts")} className={`rounded-2xl border p-3 ${itemClass("alerts")}`}>
           <Bell className="mx-auto mb-1 h-5 w-5" />
           Alerts
         </button>
