@@ -404,7 +404,7 @@ export default function FlowStatePrototype() {
            <div className="mb-4">
             <FlowStateLogo variant="full" className="h-14 w-54 rounded-2xl md:h-16 md:w-16" />
           </div>
-            <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Peel back the charts. Find the <span style="color:#ffd400">good</span> stuff.</h1>
+            <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Peel back the charts. Find the good stuff.</h1>
             <p className="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">Trade Banana measures the current market regime, checks whether that regime tends to continue, and separates market context from trade execution.</p>
           </div>
           <div className="flex flex-wrap gap-2">
