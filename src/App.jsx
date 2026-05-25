@@ -133,26 +133,75 @@ function matrixArray(matrix) {
   return states.map((r) => states.map((c) => matrix?.[r]?.[c] ?? 0));
 }
 
-function MiniChart({ data, symbol }) {
+function PriceContextCard({ data, symbol, regime, edge }) {
   const width = 580;
-  const height = 170;
-  const pad = 12;
+  const height = 220;
+  const padX = 18;
+  const padY = 26;
   const sample = data.slice(-90);
-  const max = Math.max(...sample.map((d) => Number(d.high)));
-  const min = Math.min(...sample.map((d) => Number(d.low)));
-  const x = (i) => pad + (i / Math.max(1, sample.length - 1)) * (width - pad * 2);
-  const y = (v) => pad + ((max - v) / Math.max(0.00001, max - min)) * (height - pad * 2);
-  const path = sample.map((d, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(Number(d.close))}`).join(" ");
-  const last = sample[sample.length - 1];
+  const hasData = sample.length > 1;
+  const highs = sample.map((d) => Number(d.high ?? d.close ?? 0));
+  const lows = sample.map((d) => Number(d.low ?? d.close ?? 0));
+  const max = hasData ? Math.max(...highs) : 1;
+  const min = hasData ? Math.min(...lows) : 0;
+  const range = Math.max(0.00001, max - min);
+  const x = (i) => padX + (i / Math.max(1, sample.length - 1)) * (width - padX * 2);
+  const y = (v) => padY + ((max - v) / range) * (height - padY * 2);
+  const path = hasData ? sample.map((d, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(Number(d.close))}`).join(" ") : "";
+  const last = sample[sample.length - 1] || { close: 0 };
+  const close = Number(last.close || 0);
+  const rangePosition = (close - min) / range;
+  const location = rangePosition > 0.72 ? "Extended High" : rangePosition < 0.28 ? "Pullback Area" : "Neutral";
+  const locationTone = location === "Neutral" ? "text-yellow-300" : location === "Pullback Area" ? "text-emerald-300" : "text-amber-300";
+  const edgePct = Math.round((Number(edge) || 0) * 100);
+  const edgeTone = edgePct > 0 ? "text-emerald-300" : edgePct < 0 ? "text-rose-300" : "text-slate-300";
+  const regimeTone = regime === "Bull" ? "text-emerald-300" : regime === "Bear" ? "text-rose-300" : "text-yellow-300";
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/25 p-3">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[190px] w-full">
-        {[0.25, 0.5, 0.75].map((t) => <line key={t} x1="0" x2={width} y1={height * t} y2={height * t} stroke="rgba(255,255,255,.08)" strokeDasharray="4 6" />)}
-        <path d={path} fill="none" stroke="rgba(111,240,166,.9)" strokeWidth="3" strokeLinecap="round" />
-        {sample.map((d, i) => i % 7 === 0 ? <rect key={i} x={x(i) - 1.5} y={y(Math.max(Number(d.open), Number(d.close)))} width="3" height={Math.max(3, Math.abs(y(Number(d.open)) - y(Number(d.close))))} rx="1.5" fill={Number(d.close) >= Number(d.open) ? "rgba(111,240,166,.75)" : "rgba(251,113,133,.75)"} /> : null)}
-        <circle cx={x(sample.length - 1)} cy={y(Number(last.close))} r="5" fill="white" />
-      </svg>
-      <div className="absolute right-5 top-4 rounded-full border border-white/10 bg-slate-950/80 px-3 py-1 text-xs text-slate-300">Last {fmt(last.close, symbol)}</div>
+    <div className="overflow-hidden rounded-3xl border border-yellow-400/20 bg-black/25 p-4 shadow-2xl shadow-black/30">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <div className="text-base font-semibold text-white">Price Context</div>
+          <div className="mt-1 text-xs text-slate-400">Shows where price sits within the recent range.</div>
+        </div>
+        <div className="rounded-2xl border border-yellow-400/25 bg-black/35 px-3 py-2 text-sm font-semibold text-slate-100">
+          Last {fmt(close, symbol)}
+        </div>
+      </div>
+
+      <div className="relative rounded-2xl border border-white/10 bg-black/30 p-3">
+        <svg viewBox={`0 0 ${width} ${height}`} className="h-[230px] w-full">
+          <defs>
+            <linearGradient id="tbPriceGlow" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,212,0,.28)" />
+              <stop offset="55%" stopColor="rgba(255,212,0,.10)" />
+              <stop offset="100%" stopColor="rgba(255,212,0,0)" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width={width} height={height} rx="18" fill="rgba(0,0,0,.18)" />
+          {[0.25, 0.5, 0.75].map((t) => <line key={t} x1="0" x2={width} y1={height * t} y2={height * t} stroke="rgba(255,255,255,.07)" strokeDasharray="4 8" />)}
+          {hasData ? <>
+            <line x1="0" x2={width} y1={y(max)} y2={y(max)} stroke="rgba(255,212,0,.35)" strokeDasharray="7 10" />
+            <line x1="0" x2={width} y1={y(min)} y2={y(min)} stroke="rgba(255,212,0,.28)" strokeDasharray="7 10" />
+            <text x="8" y={Math.max(18, y(max) - 7)} fill="rgba(255,255,255,.72)" fontSize="12">Recent High</text>
+            <text x={width - 86} y={Math.max(18, y(max) - 7)} fill="rgba(255,255,255,.72)" fontSize="12">{fmt(max, symbol)}</text>
+            <text x="8" y={Math.min(height - 8, y(min) + 18)} fill="rgba(255,255,255,.60)" fontSize="12">Recent Low</text>
+            <text x={width - 86} y={Math.min(height - 8, y(min) + 18)} fill="rgba(255,255,255,.60)" fontSize="12">{fmt(min, symbol)}</text>
+            <path d={`${path} L${x(sample.length - 1)},${height - padY} L${x(0)},${height - padY} Z`} fill="url(#tbPriceGlow)" opacity="0.75" />
+            <path d={path} fill="none" stroke="rgba(255,212,0,.96)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx={x(sample.length - 1)} cy={y(close)} r="6" fill="white" />
+          </> : null}
+        </svg>
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-2xl border border-white/10 bg-black/70 px-4 py-2 text-sm backdrop-blur">
+          <span className="text-slate-400">Location:</span> <span className={`font-bold ${locationTone}`}>{location}</span>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><div className="text-xs text-slate-400">Regime</div><div className={`mt-1 font-bold ${regimeTone}`}>{regime} Regime</div></div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><div className="text-xs text-slate-400">Location</div><div className={`mt-1 font-bold ${locationTone}`}>{location}</div></div>
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><div className="text-xs text-slate-400">Edge</div><div className={`mt-1 font-bold ${edgeTone}`}>{edgePct > 0 ? "+" : ""}{edgePct}%</div></div>
+      </div>
     </div>
   );
 }
@@ -430,7 +479,7 @@ export default function FlowStatePrototype() {
                   <Button onClick={() => setSmcConfirm(!smcConfirm)} className={`rounded-xl ${smcConfirm ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "bg-white/10 text-white hover:bg-white/15"}`}>{smcConfirm ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />} {smcConfirm ? "Entry confirmed" : "Entry not confirmed"}</Button>
                   <Button title="Fetch latest candles, update the regime model, save a new snapshot, and recalculate the decision." onClick={loadAnalysis} disabled={loading} className="rounded-xl bg-white/10 text-white hover:bg-white/15">{loading ? <RefreshCw className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />} Refresh</Button>
                 </div>
-                <MiniChart data={candles} symbol={symbol} />
+                <PriceContextCard data={candles} symbol={symbol} regime={current} edge={probs.directional_edge} />
               </div>
 
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={`rounded-3xl border p-5 ${toneClasses[tone]}`}>
