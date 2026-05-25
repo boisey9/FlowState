@@ -227,6 +227,113 @@ function getWhyDecision(model, smcConfirm) {
   return `Trade Banana says WAIT because there is no clean directional edge. Bull Next is ${bull}% and Bear Next is ${bear}%, so the model is not showing enough separation to support a trade idea.`;
 }
 
+function getEntryReadiness(model, smcConfirm) {
+  const current = model.current?.regime || "Sideways";
+  const action = model.decision?.action || "WAIT";
+  const probs = model.probabilities || {};
+  const edge = Number(probs.directional_edge || 0);
+  const score = Number(model.data_quality?.score ?? 0);
+  const candles = model.candles || [];
+  const latest = candles[candles.length - 1];
+  const sample = candles.slice(-30);
+  const high = Math.max(...sample.map((d) => Number(d.high ?? d.close ?? 0)));
+  const low = Math.min(...sample.map((d) => Number(d.low ?? d.close ?? 0)));
+  const close = Number(latest?.close ?? model.current?.close ?? 0);
+  const range = Math.max(0.00001, high - low);
+  const rangePosition = Number.isFinite(close) ? (close - low) / range : 0.5;
+  const isLongContext = action === "READY_LONG" || (current === "Bull" && edge >= 0.12);
+  const isShortContext = action === "READY_SHORT" || (current === "Bear" && edge <= -0.12);
+  const direction = isLongContext ? "LONG" : isShortContext ? "SHORT" : "NONE";
+  const contextPass = score >= 80 && direction !== "NONE";
+  const locationPass = !contextPass ? false : direction === "LONG" ? rangePosition <= 0.68 : rangePosition >= 0.32;
+  const triggerPass = contextPass && locationPass && (smcConfirm || action === "READY_LONG" || action === "READY_SHORT");
+
+  let final = "NO SETUP";
+  let finalTone = "neutral";
+  let summary = "No clean entry context yet.";
+
+  if (score < 80) {
+    final = "IGNORE";
+    finalTone = "danger";
+    summary = "Data quality blocks entry readiness.";
+  } else if (triggerPass) {
+    final = `READY ${direction}`;
+    finalTone = direction === "LONG" ? "bull" : "bear";
+    summary = `${direction} context, location, and manual trigger are aligned.`;
+  } else if (contextPass && locationPass) {
+    final = "CONFIRMATION NEEDED";
+    finalTone = "warn";
+    summary = "Context and location are present, but the trigger is not confirmed.";
+  } else if (contextPass) {
+    final = `WATCH ${direction}`;
+    finalTone = "warn";
+    summary = `${direction} context is active. Wait for a better pullback/location.`;
+  }
+
+  const rowTone = (status) => status === "PASS" ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200" : status === "WAIT" ? "border-yellow-400/30 bg-yellow-500/10 text-yellow-200" : "border-white/10 bg-white/5 text-slate-300";
+
+  return {
+    direction,
+    final,
+    finalTone,
+    summary,
+    rows: [
+      {
+        label: "Context",
+        status: contextPass ? "PASS" : "WAIT",
+        detail: contextPass ? `${current} regime with ${Math.round(edge * 100)}% directional edge.` : "Needs a clear Bull/Bear regime and stronger edge.",
+        icon: <Activity className="h-4 w-4" />,
+        cls: rowTone(contextPass ? "PASS" : "WAIT"),
+      },
+      {
+        label: "Location",
+        status: locationPass ? "PASS" : "WAIT",
+        detail: !contextPass ? "Waiting for context first." : locationPass ? "Price is not extended for the active direction." : "Price has not pulled back enough. Do not chase.",
+        icon: <Gauge className="h-4 w-4" />,
+        cls: rowTone(locationPass ? "PASS" : "WAIT"),
+      },
+      {
+        label: "Trigger",
+        status: triggerPass ? "PASS" : "WAIT",
+        detail: triggerPass ? "Entry confirmation is on." : "No manual sweep/rejection/confirmation yet.",
+        icon: <Zap className="h-4 w-4" />,
+        cls: rowTone(triggerPass ? "PASS" : "WAIT"),
+      },
+    ],
+  };
+}
+
+function EntryReadinessCard({ readiness }) {
+  const finalCls = readiness.finalTone === "bull" ? "text-emerald-300" : readiness.finalTone === "bear" ? "text-rose-300" : readiness.finalTone === "danger" ? "text-rose-200" : readiness.finalTone === "warn" ? "text-yellow-300" : "text-slate-300";
+  return (
+    <Card className="border-yellow-400/30 bg-white/[0.03]">
+      <CardContent className="p-5">
+        <SectionTitle title="Entry Readiness" subtitle="Lightweight live layer — context first, trigger last." icon={<Zap className="h-5 w-5 text-yellow-300" />} tooltip="This does not add a new trading engine. It summarizes live model output into Context, Location, and Trigger gates." />
+        <div className="grid gap-3 lg:grid-cols-3">
+          {readiness.rows.map((row, index) => (
+            <div key={row.label} className={`rounded-2xl border p-4 ${row.cls}`}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 font-semibold"><span className="flex h-8 w-8 items-center justify-center rounded-full border border-current/30 bg-black/20">{row.icon}</span>{index + 1}. {row.label}</div>
+                <span className="rounded-xl border border-current/30 bg-black/20 px-3 py-1 text-xs font-bold">{row.status}</span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-slate-300">{row.detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_2fr]">
+          <div className="rounded-2xl border border-yellow-400/25 bg-black/25 p-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Final Status</div>
+            <div className={`mt-2 text-2xl font-bold ${finalCls}`}>{readiness.final}</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-slate-300">
+            {readiness.summary} Trade Banana still requires your risk plan before any real trade decision.
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function FlowStatePrototype() {
   const [symbol, setSymbol] = useState("XAUUSD");
   const [tf, setTf] = useState("1D");
@@ -278,6 +385,7 @@ export default function FlowStatePrototype() {
   const decision = model.decision || {};
   const probs = model.probabilities || {};
   const alertStatus = useMemo(() => getAlertStatus(model), [model]);
+  const entryReadiness = useMemo(() => getEntryReadiness(model, smcConfirm), [model, smcConfirm]);
 
   const tone = decision.action === "READY_LONG" ? "bull" : decision.action === "READY_SHORT" ? "bear" : decision.action === "IGNORE" ? "danger" : decision.bias === "Bullish" || decision.bias === "Bearish" ? "warn" : "neutral";
   const toneClasses = {
@@ -346,6 +454,8 @@ export default function FlowStatePrototype() {
           </CardContent>
         </Card>
 
+        <EntryReadinessCard readiness={entryReadiness} />
+
         <div className="grid gap-5 lg:grid-cols-3">
           <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Current Market State" subtitle="Current Bull, Bear, or Sideways classification based on recent rolling return behavior." icon={<Activity className="h-5 w-5 text-emerald-300" />} tooltip="This tells you the current statistical market state. It is context, not an automatic entry." /><div className={`inline-flex rounded-2xl border px-4 py-2 text-2xl font-bold ${stateStyle[current]}`}>{current} Regime</div><p className="mt-4 text-sm text-slate-400">Asset behavior: {ASSETS[symbol].personality}.</p><div className="mt-5 text-sm text-slate-400">As of: {model.current?.ts || "—"}</div></CardContent></Card>
           <Card className="border-white/10 bg-white/[0.03]"><CardContent className="p-5"><SectionTitle title="Data Quality Gate" subtitle="Checks whether candle data is fresh, complete, and usable before decisions are trusted." icon={<Gauge className="h-5 w-5 text-emerald-300" />} tooltip="Below 80 blocks trading decisions. 90–100 means data is clean enough for analysis." /><div className="text-4xl font-bold">{model.data_quality?.score ?? dataQuality}%</div><div className="mt-5 space-y-2 text-sm text-slate-300">{(model.data_quality?.issues || []).length ? model.data_quality.issues.map((x) => <div key={x} className="rounded-xl border border-amber-400/20 bg-amber-500/10 p-2 text-amber-100">{x}</div>) : <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-2 text-emerald-100">Data is clean — no quality issues detected</div>}</div></CardContent></Card>
@@ -364,7 +474,7 @@ export default function FlowStatePrototype() {
           <div className="grid gap-3 text-sm text-slate-300 md:grid-cols-5">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>1. Start with Trade Permission.</b><br />If it says WAIT or IGNORE, do not force a trade.</div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>2. Check Current Market State.</b><br />This shows Bull, Bear, or Sideways context.</div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>3. Read the active matrix row.</b><br />It shows what usually happens next from the current state.</div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>3. Read Entry Readiness.</b><br />Context, location, and trigger must align before READY.</div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>4. Use Directional Edge.</b><br />Positive favors long context. Negative favors short context.</div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3"><b>5. Confirm execution.</b><br />Trade Banana gives context. Your entry model confirms timing.</div>
           </div>
