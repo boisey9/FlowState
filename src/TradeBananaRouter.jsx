@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import App from "./App.jsx";
 import WatchlistPage from "./pages/WatchlistPage.jsx";
 import AlertsPage from "./pages/AlertsPage.jsx";
+import BananaAnalysisPage from "./pages/BananaAnalysisPage.jsx";
 import TradeBananaNavigation from "./components/TradeBananaNavigation.jsx";
 
 function getRoute() {
   const hash = window.location.hash.replace("#", "").toLowerCase();
   if (hash === "watchlist") return "watchlist";
   if (hash === "alerts") return "alerts";
+  if (hash === "banana-analysis" || hash === "banana") return "banana-analysis";
   return "analyze";
 }
 
@@ -53,8 +55,16 @@ export default function TradeBananaRouter() {
 
   return (
     <>
-      {route === "watchlist" ? <WatchlistPage /> : route === "alerts" ? <AlertsPage /> : <App />}
-      <AnalyzeSelectionSync active={route === "analyze"} />
+      {route === "watchlist" ? (
+        <WatchlistPage />
+      ) : route === "alerts" ? (
+        <AlertsPage />
+      ) : route === "banana-analysis" ? (
+        <BananaAnalysisPage />
+      ) : (
+        <App />
+      )}
+      <AnalyzeSelectionSync active={route === "analyze" || route === "banana-analysis"} />
       <TradeBananaNavigation active={route} />
     </>
   );
