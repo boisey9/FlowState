@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, Search, Star } from "lucide-react";
+import { Bell, Search, Sprout, Star } from "lucide-react";
 
 export default function TradeBananaNavigation({ active = "analyze" }) {
   const go = (route) => {
@@ -18,6 +18,9 @@ export default function TradeBananaNavigation({ active = "analyze" }) {
           <button onClick={() => go("analyze")} className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("analyze")}`}>
             Analyze
           </button>
+          <button onClick={() => go("banana-analysis")} className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("banana-analysis")}`}>
+            Banana Analysis
+          </button>
           <button onClick={() => go("watchlist")} className={`rounded-2xl border px-5 py-2 text-sm font-semibold ${itemClass("watchlist")}`}>
             Watchlist
           </button>
@@ -27,10 +30,14 @@ export default function TradeBananaNavigation({ active = "analyze" }) {
         </div>
       </div>
 
-      <div className="trade-banana-bottom-nav fixed bottom-3 left-4 right-4 z-30 grid grid-cols-3 rounded-3xl border border-yellow-400/20 bg-black/90 p-2 text-center text-xs backdrop-blur-xl md:hidden">
+      <div className="trade-banana-bottom-nav fixed bottom-3 left-4 right-4 z-30 grid grid-cols-4 rounded-3xl border border-yellow-400/20 bg-black/90 p-2 text-center text-[11px] backdrop-blur-xl md:hidden">
         <button onClick={() => go("analyze")} className={`rounded-2xl border p-3 ${itemClass("analyze")}`}>
           <Search className="mx-auto mb-1 h-5 w-5" />
           Analyze
+        </button>
+        <button onClick={() => go("banana-analysis")} className={`rounded-2xl border p-3 ${itemClass("banana-analysis")}`}>
+          <Sprout className="mx-auto mb-1 h-5 w-5" />
+          Banana
         </button>
         <button onClick={() => go("watchlist")} className={`rounded-2xl border p-3 ${itemClass("watchlist")}`}>
           <Star className="mx-auto mb-1 h-5 w-5" />
