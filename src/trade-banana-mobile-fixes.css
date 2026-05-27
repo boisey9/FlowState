@@ -6,6 +6,14 @@
 }
 
 @media (max-width: 767px) {
+  html,
+  body,
+  #root {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
   .min-h-screen {
     padding-bottom: calc(9.5rem + env(safe-area-inset-bottom)) !important;
   }
@@ -14,12 +22,121 @@
     left: 1rem !important;
     right: 1rem !important;
   }
+
+  /* Banana Analysis: keep each major section inside the mobile viewport. */
+  #root > .min-h-screen {
+    padding-left: 0.875rem !important;
+    padding-right: 0.875rem !important;
+  }
+
+  #root .max-w-7xl {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  #root .max-w-7xl::after {
+    right: -170px !important;
+    width: 360px !important;
+    height: 360px !important;
+    transform: none !important;
+    opacity: 0.22 !important;
+  }
+
+  /* Controls: prevent the long ticker selector/buttons from creating horizontal scroll. */
+  #root select.rounded-xl,
+  #root button.rounded-xl {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #root .flex.flex-wrap.items-center.gap-3 {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  /* Price chart: shorter and safer on phones. */
+  #root svg.h-\[230px\] {
+    height: 185px !important;
+  }
+
+  /* Banana Permission Card: stack stat boxes on narrow screens. */
+  #root .mt-5.grid.grid-cols-3.gap-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Matrices/tables: keep readable without forcing the full page wider. */
+  #root .grid.grid-cols-4.gap-2 {
+    grid-template-columns: minmax(78px, 1fr) repeat(3, minmax(68px, 1fr)) !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Generic three-column metric rows should collapse on phone. */
+  #root .grid.grid-cols-3.gap-2,
+  #root .grid.grid-cols-3.gap-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Banana State Map: show compact image cards on mobile. */
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 {
+    grid-template-columns: 1fr !important;
+  }
+
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 > div {
+    min-height: 128px !important;
+    padding: 18px 18px 18px 126px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 > div::before {
+    top: 50% !important;
+    left: 16px !important;
+    width: 92px !important;
+    height: 76px !important;
+    transform: translateY(-50%) !important;
+  }
+
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 > div > div:first-child::after {
+    font-size: 1rem !important;
+  }
 }
 
 @media (max-width: 640px) {
   .min-h-screen {
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
     padding-top: 1.25rem !important;
+  }
+
+  h1.text-3xl,
+  .text-3xl {
+    font-size: 2rem !important;
+    line-height: 1.08 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .trade-banana-bottom-nav {
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .trade-banana-bottom-nav button {
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+  }
+
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 > div {
+    padding-left: 108px !important;
+  }
+
+  #root .grid.gap-2.sm\:grid-cols-2.xl\:grid-cols-6 > div::before {
+    left: 12px !important;
+    width: 82px !important;
+    height: 68px !important;
   }
 }
