@@ -71,8 +71,11 @@ function loadWatchlistItems() {
 
 function getAnalyzeWatchlistItems() {
   const watchlistItems = loadWatchlistItems();
-  const supportedItems = watchlistItems.filter((item) => KNOWN_ANALYZE_SYMBOLS.includes(item.symbol));
-  return supportedItems.length ? supportedItems : DEFAULT_WATCHLIST;
+  const items = watchlistItems.length ? watchlistItems : DEFAULT_WATCHLIST;
+  return items.map((item) => ({
+    ...item,
+    supported: KNOWN_ANALYZE_SYMBOLS.includes(item.symbol),
+  }));
 }
 
 function findAnalyzeSymbolSelect(selects) {
@@ -84,6 +87,8 @@ function findAnalyzeSymbolSelect(selects) {
 
 function syncAnalyzeSymbolDropdownToWatchlist() {
   const items = getAnalyzeWatchlistItems();
+  const supportedItems = items.filter((item) => item.supported);
+  const selectableItems = supportedItems.length ? supportedItems : DEFAULT_WATCHLIST.map((item) => ({ ...item, supported: true }));
   if (!items.length) return;
 
   const selects = Array.from(document.querySelectorAll("select"));
@@ -91,22 +96,23 @@ function syncAnalyzeSymbolDropdownToWatchlist() {
   if (!target) return;
 
   const savedSymbol = safeLocalStorageGet("trade_banana_selected_symbol").trim().toUpperCase();
-  const targetSymbols = items.map((item) => item.symbol);
-  const nextValue = targetSymbols.includes(target.value)
+  const selectableSymbols = selectableItems.map((item) => item.symbol);
+  const nextValue = selectableSymbols.includes(target.value)
     ? target.value
-    : targetSymbols.includes(savedSymbol)
+    : selectableSymbols.includes(savedSymbol)
       ? savedSymbol
-      : items[0].symbol;
+      : selectableItems[0].symbol;
 
-  const currentSignature = Array.from(target.options).map((option) => `${option.value}:${option.textContent}`).join("|");
-  const nextSignature = items.map((item) => `${item.symbol}:${item.symbol} — ${item.name || item.symbol}`).join("|");
+  const currentSignature = Array.from(target.options).map((option) => `${option.value}:${option.textContent}:${option.disabled}`).join("|");
+  const nextSignature = items.map((item) => `${item.symbol}:${item.symbol} — ${item.name || item.symbol}${item.supported ? "" : " (watchlist only)"}:${!item.supported}`).join("|");
 
   if (currentSignature !== nextSignature) {
     target.innerHTML = "";
     items.forEach((item) => {
       const option = document.createElement("option");
       option.value = item.symbol;
-      option.textContent = `${item.symbol} — ${item.name || item.symbol}`;
+      option.disabled = !item.supported;
+      option.textContent = `${item.symbol} — ${item.name || item.symbol}${item.supported ? "" : " (watchlist only)"}`;
       target.appendChild(option);
     });
   }
@@ -127,7 +133,7 @@ function applySavedAnalyzeSelection() {
 
   const setSelectValue = (value) => {
     if (!value) return;
-    const target = selects.find((select) => Array.from(select.options).some((option) => option.value === value));
+    const target = selects.find((select) => Array.from(select.options).some((option) => option.value === value && !option.disabled));
     if (!target || target.value === value) return;
     target.value = value;
     target.dispatchEvent(new Event("change", { bubbles: true }));
