@@ -40,6 +40,14 @@ function safeLocalStorageGet(key) {
   }
 }
 
+function safeLocalStorageSet(key, value) {
+  try {
+    window.localStorage?.setItem(key, value);
+  } catch {
+    // Ignore storage errors in private mode.
+  }
+}
+
 function loadWatchlistItems() {
   try {
     const stored = JSON.parse(safeLocalStorageGet(WATCHLIST_STORAGE_KEY) || "[]");
@@ -61,6 +69,12 @@ function loadWatchlistItems() {
   }
 }
 
+function getAnalyzeWatchlistItems() {
+  const watchlistItems = loadWatchlistItems();
+  const supportedItems = watchlistItems.filter((item) => KNOWN_ANALYZE_SYMBOLS.includes(item.symbol));
+  return supportedItems.length ? supportedItems : DEFAULT_WATCHLIST;
+}
+
 function findAnalyzeSymbolSelect(selects) {
   return selects.find((select) => {
     const values = Array.from(select.options).map((option) => option.value);
@@ -69,7 +83,7 @@ function findAnalyzeSymbolSelect(selects) {
 }
 
 function syncAnalyzeSymbolDropdownToWatchlist() {
-  const items = loadWatchlistItems();
+  const items = getAnalyzeWatchlistItems();
   if (!items.length) return;
 
   const selects = Array.from(document.querySelectorAll("select"));
@@ -99,11 +113,7 @@ function syncAnalyzeSymbolDropdownToWatchlist() {
 
   if (target.value !== nextValue) {
     target.value = nextValue;
-    try {
-      window.localStorage.setItem("trade_banana_selected_symbol", nextValue);
-    } catch {
-      // Ignore storage errors in private mode.
-    }
+    safeLocalStorageSet("trade_banana_selected_symbol", nextValue);
     target.dispatchEvent(new Event("change", { bubbles: true }));
   }
 }
