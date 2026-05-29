@@ -5,6 +5,10 @@ import AlertsPage from "./pages/AlertsPage.jsx";
 import BananaAnalysisPage from "./pages/BananaAnalysisPage.jsx";
 import TradeBananaNavigation from "./components/TradeBananaNavigation.jsx";
 
+const WATCHLIST_STORAGE_KEY = "trade_banana_watchlist";
+const DEFAULT_WATCHLIST = [{ symbol: "XAUUSD", name: "Gold / U.S. Dollar" }];
+const KNOWN_ANALYZE_SYMBOLS = ["XAUUSD", "BTC-USD", "SPY", "QQQ", "AAPL", "NVDA", "MSFT", "TSLA"];
+
 function normalizeRoute(value = "") {
   return value
     .replace(/^#/, "")
@@ -36,7 +40,77 @@ function safeLocalStorageGet(key) {
   }
 }
 
+function loadWatchlistItems() {
+  try {
+    const stored = JSON.parse(safeLocalStorageGet(WATCHLIST_STORAGE_KEY) || "[]");
+    if (!Array.isArray(stored) || stored.length === 0) return DEFAULT_WATCHLIST;
+
+    const seen = new Set();
+    return stored
+      .map((item) => ({
+        symbol: String(item?.symbol || "").trim().toUpperCase(),
+        name: String(item?.name || item?.symbol || "").trim(),
+      }))
+      .filter((item) => {
+        if (!item.symbol || seen.has(item.symbol)) return false;
+        seen.add(item.symbol);
+        return true;
+      });
+  } catch {
+    return DEFAULT_WATCHLIST;
+  }
+}
+
+function findAnalyzeSymbolSelect(selects) {
+  return selects.find((select) => {
+    const values = Array.from(select.options).map((option) => option.value);
+    return values.some((value) => KNOWN_ANALYZE_SYMBOLS.includes(value));
+  });
+}
+
+function syncAnalyzeSymbolDropdownToWatchlist() {
+  const items = loadWatchlistItems();
+  if (!items.length) return;
+
+  const selects = Array.from(document.querySelectorAll("select"));
+  const target = findAnalyzeSymbolSelect(selects);
+  if (!target) return;
+
+  const savedSymbol = safeLocalStorageGet("trade_banana_selected_symbol").trim().toUpperCase();
+  const targetSymbols = items.map((item) => item.symbol);
+  const nextValue = targetSymbols.includes(target.value)
+    ? target.value
+    : targetSymbols.includes(savedSymbol)
+      ? savedSymbol
+      : items[0].symbol;
+
+  const currentSignature = Array.from(target.options).map((option) => `${option.value}:${option.textContent}`).join("|");
+  const nextSignature = items.map((item) => `${item.symbol}:${item.symbol} — ${item.name || item.symbol}`).join("|");
+
+  if (currentSignature !== nextSignature) {
+    target.innerHTML = "";
+    items.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.symbol;
+      option.textContent = `${item.symbol} — ${item.name || item.symbol}`;
+      target.appendChild(option);
+    });
+  }
+
+  if (target.value !== nextValue) {
+    target.value = nextValue;
+    try {
+      window.localStorage.setItem("trade_banana_selected_symbol", nextValue);
+    } catch {
+      // Ignore storage errors in private mode.
+    }
+    target.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+}
+
 function applySavedAnalyzeSelection() {
+  syncAnalyzeSymbolDropdownToWatchlist();
+
   const savedSymbol = safeLocalStorageGet("trade_banana_selected_symbol");
   const savedTimeframe = safeLocalStorageGet("trade_banana_selected_timeframe");
   const selects = Array.from(document.querySelectorAll("select"));
@@ -56,12 +130,22 @@ function applySavedAnalyzeSelection() {
 function AnalyzeSelectionSync({ active }) {
   useEffect(() => {
     if (!active) return;
-    const timers = [
-      window.setTimeout(applySavedAnalyzeSelection, 0),
-      window.setTimeout(applySavedAnalyzeSelection, 80),
-      window.setTimeout(applySavedAnalyzeSelection, 250),
-    ];
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
+
+    const sync = () => applySavedAnalyzeSelection();
+    const timers = [0, 80, 250, 600, 1200].map((delay) => window.setTimeout(sync, delay));
+
+    const observer = new MutationObserver(sync);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener("storage", sync);
+    window.addEventListener("trade_banana_watchlist_changed", sync);
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+      observer.disconnect();
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("trade_banana_watchlist_changed", sync);
+    };
   }, [active]);
 
   return null;
